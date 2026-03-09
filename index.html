@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ankur Podder | Bio v2.3 (Restored)</title>
+    <title>Ankur Podder | Bio v3.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -21,35 +21,73 @@
         
         #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; background: var(--grass); overflow: hidden; }
         
-        #map { position: absolute; bottom: 0; left: 0; width: 100%; height: 500vh; background-image: radial-gradient(var(--grass-dark) 10%, transparent 11%); background-size: 30px 30px; }
-        
+        /* --- FLASHBACK BACKGROUND (ROOTS) --- */
+        #roots-flashback {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('roots-background.png') no-repeat center center;
+            background-size: cover;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Pulse Animation for Trees */
+        .tree-pulse {
+            position: absolute;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            mix-blend-mode: screen;
+            animation: pulseLight 4s infinite alternate;
+        }
+        #pulse-1 { top: 20%; left: 15%; }
+        #pulse-2 { top: 10%; right: 20%; }
+
+        @keyframes pulseLight { from { opacity: 0.2; transform: scale(1); } to { opacity: 0.6; transform: scale(1.1); } }
+
+        /* Moving Water Overlay */
+        .water-overlay {
+            position: absolute;
+            bottom: 0; width: 100%; height: 30%;
+            background: linear-gradient(transparent, rgba(37, 99, 235, 0.2));
+            overflow: hidden;
+        }
+        .wave-line {
+            position: absolute;
+            width: 200%; height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            animation: waveSlide 8s linear infinite;
+        }
+        @keyframes waveSlide { from { transform: translateX(-50%); } to { transform: translateX(0%); } }
+
+        /* Drifting Boat */
+        .drifting-boat {
+            position: absolute;
+            bottom: 15%; left: 20%;
+            width: 40px; height: 20px;
+            background: #451a03;
+            border-radius: 0 0 10px 10px;
+            animation: boatDrift 15s ease-in-out infinite alternate;
+        }
+        @keyframes boatDrift { 
+            from { transform: translateX(0) rotate(-2deg); } 
+            to { transform: translateX(100px) rotate(2deg); } 
+        }
+
+        /* --- STABLE GBA MAP --- */
+        #map { position: absolute; bottom: 0; left: 0; width: 100%; height: 500vh; background-image: radial-gradient(var(--grass-dark) 10%, transparent 11%); background-size: 30px 30px; z-index: 10; }
         .forest-wall { position: absolute; top: 0; height: 100%; width: 15vw; background-image: radial-gradient(circle, var(--tree-leaf) 60%, transparent 60%); background-size: 50px 50px; border-right: 6px solid var(--tree-shadow); }
-        .forest-wall.right { right: 0; left: auto; border-right: none; border-left: 6px solid var(--tree-shadow); }
-        
+        .forest-wall.right { right: 0; left: auto; border-left: 6px solid var(--tree-shadow); }
         .route-path { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 100%; background: var(--path); border-left: 6px solid var(--path-border); border-right: 6px solid var(--path-border); }
+        .poi-sign { position: absolute; left: calc(50% + 90px); width: 100px; padding: 5px; background: #fff; color: #000; border: 2px solid #000; font-size: 0.8rem; text-align: center; margin-top: 20px; }
+        #cp-0 { bottom: 20vh; position: absolute; left: 50%; transform: translateX(-50%); }
 
-        /* THE ISLAND */
-        .env-island { position: absolute; left: calc(50% - 320px); bottom: 20vh; width: 220px; height: 180px; z-index: 5; }
-        .water-body { position: absolute; width: 100%; height: 100%; background: var(--water-deep); border-radius: 30% 70% 50% 50% / 50% 30% 70% 50%; border: 4px solid var(--water-foam); overflow: hidden; }
-        .water-body::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background-image: linear-gradient(0deg, transparent 45%, var(--water-foam) 50%, transparent 55%); background-size: 100% 40px; animation: waveMove 6s linear infinite; opacity: 0.3; }
-        @keyframes waveMove { from { transform: translateY(0); } to { transform: translateY(40px); } }
-        .sand-patch { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 110px; height: 85px; background: var(--sand); border-radius: 40% 60% 60% 40% / 50% 50% 50% 50%; border: 3px solid #d97706; }
-        .pixel-tree { position: absolute; top: -35px; left: 25px; }
-        .pixel-trunk { width: 16px; height: 45px; background: var(--trunk); border: 3px solid #451a03; }
-        .pixel-leaves { position: absolute; top: -45px; left: -25px; width: 70px; height: 70px; background: var(--tree-leaf); border: 4px solid var(--tree-shadow); border-radius: 50% 50% 40% 40%; animation: treeSway 3s ease-in-out infinite alternate; }
-        @keyframes treeSway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
-
-        /* DECAY POINTS */
-        .poi-building { position: absolute; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: #fff; border: 4px solid #000; border-radius: 8px 8px 0 0; display: flex; align-items: flex-end; justify-content: center; box-shadow: 10px 10px 0 rgba(0,0,0,0.2); z-index: 10; }
-        .poi-building::after { content: ''; width: 20px; height: 30px; background: #000; display: block; }
-        .poi-sign { position: absolute; left: calc(50% + 90px); width: 100px; padding: 5px; background: #fff; color: #000; border: 2px solid #000; font-size: 0.8rem; text-align: center; margin-top: 20px; z-index: 10; }
-        #cp-0 { bottom: 20vh; } #cp-1 { bottom: 120vh; } #cp-2 { bottom: 220vh; } #cp-3 { bottom: 320vh; }
-
-        /* UI */
         #player { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 36px; background: #ef4444; border: 3px solid #000; border-radius: 14px 14px 0 0; z-index: 50; }
         #player::after { content: ''; display: block; width: 18px; height: 18px; background: #fee2e2; border-radius: 50%; margin: 4px auto; }
         #dialog-box { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; height: 120px; background: #fff; color: #000; border: 6px solid #000; padding: 1rem; display: none; z-index: 60; box-sizing: border-box; }
-        #dialog-text { font-family: var(--font-logo); font-size: 1rem; line-height: 1.5; }
         #scroll-proxy { height: 500vh; width: 100%; position: absolute; top: 0; pointer-events: none; }
     </style>
 </head>
@@ -57,24 +95,27 @@
 
 <div id="boot-screen" onclick="startGame()">
     <div class="pokedex-box">
-        <h2>DEXDOGS_OS v2.3 (Restored)</h2>
+        <h2>DEXDOGS_OS v3.1</h2>
         <p>[ INITIALIZE WORLD ]</p>
     </div>
+</div>
+
+<div id="roots-flashback">
+    <div class="tree-pulse" id="pulse-1"></div>
+    <div class="tree-pulse" id="pulse-2"></div>
+    <div class="water-overlay">
+        <div class="wave-line" style="top:20%"></div>
+        <div class="wave-line" style="top:60%; animation-delay: -4s;"></div>
+    </div>
+    <div class="drifting-boat"></div>
 </div>
 
 <div id="game-container">
     <div id="map">
         <div class="forest-wall"></div>
         <div class="forest-wall right"></div>
-        <div class="env-island">
-            <div class="water-body"></div>
-            <div class="sand-patch"><div class="pixel-tree"><div class="pixel-leaves"></div><div class="pixel-trunk"></div></div></div>
-        </div>
         <div class="route-path"></div>
-        <div class="poi-building" id="cp-0"><div class="poi-sign">00-10</div></div>
-        <div class="poi-building" id="cp-1"><div class="poi-sign">11-20</div></div>
-        <div class="poi-building" id="cp-2"><div class="poi-sign">21-30</div></div>
-        <div class="poi-building" id="cp-3"><div class="poi-sign">31-40</div></div>
+        <div id="cp-0"><div class="poi-sign">00-10: ROOTS</div></div>
     </div>
     <div id="player"></div>
     <div id="dialog-box"><div id="dialog-text">...</div></div>
@@ -84,13 +125,6 @@
 
 <script>
     gsap.registerPlugin(ScrollTrigger);
-
-    const dialogs = [
-        "Foundational years. Early curiosity in environmental systems.",
-        "Academic foundations at MIT. Initial technical engineering.",
-        "Research Scientist tenure. Deep focus on carbon markets at NREL.",
-        "Founder era. Launching dexdogs to fix environmental data."
-    ];
 
     function startGame() {
         document.getElementById('boot-screen').style.opacity = 0;
@@ -102,25 +136,34 @@
     }
 
     function initScroll() {
+        // Move GBA Map
         gsap.to("#map", {
             y: "400vh", ease: "none",
             scrollTrigger: { trigger: "#scroll-proxy", start: "top top", end: "bottom bottom", scrub: true }
         });
 
-        [20, 120, 220, 320].forEach((pos, index) => {
-            ScrollTrigger.create({
-                trigger: "#scroll-proxy", start: `${pos - 10}vh center`, end: `${pos + 10}vh center`,
-                onEnter: () => showDialog(index), onEnterBack: () => showDialog(index),
-                onLeave: hideDialog, onLeaveBack: hideDialog
-            });
+        // ROOTS FLASHBACK TRIGGER (Option A)
+        ScrollTrigger.create({
+            trigger: "#scroll-proxy",
+            start: "0% top",
+            end: "25% top",
+            onEnter: () => showFlashback(),
+            onLeave: () => hideFlashback(),
+            onEnterBack: () => showFlashback(),
+            onLeaveBack: () => hideFlashback()
         });
     }
 
-    function showDialog(index) {
-        document.getElementById('dialog-text').innerText = dialogs[index];
+    function showFlashback() {
+        document.getElementById('roots-flashback').style.opacity = 1;
+        document.getElementById('dialog-text').innerText = "Flashback: Early curiosity in environmental systems and mapping.";
         document.getElementById('dialog-box').style.display = 'block';
     }
-    function hideDialog() { document.getElementById('dialog-box').style.display = 'none'; }
+
+    function hideFlashback() {
+        document.getElementById('roots-flashback').style.opacity = 0;
+        document.getElementById('dialog-box').style.display = 'none';
+    }
 </script>
 </body>
 </html>
