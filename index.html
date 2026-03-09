@@ -3,67 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Island Tileset - Coded Image</title>
+    <title>Ankur Podder | Bio v2.3 (Restored)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         @font-face { font-family: 'BPdots'; src: url('./BPdots.otf'); }
-        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #333; overflow: hidden; font-family: 'BPdots', sans-serif; }
-        .rpg-map-container { position: relative; width: 1000px; height: 1000px; border: 10px solid #222; overflow: hidden; }
+        :root { 
+            --grass: #5ac54f; --grass-dark: #306230; --path: #debb7b; --path-border: #b89056; 
+            --tree-leaf: #2d7a22; --tree-shadow: #1b5212; --trunk: #8b5a2b;
+            --water-deep: #2563eb; --water-foam: #60a5fa; --sand: #fde68a; --ui-bg: #121212;
+        }
+        body, html { margin: 0; background: #000; overflow-x: hidden; font-family: 'BPdots', monospace; color: #fff; }
         
-        /* Terrain Tiles (Grid) */
-        .grid-layer { position: absolute; top: 0; left: 0; display: grid; grid-template-columns: repeat(20, 1fr); grid-template-rows: repeat(20, 1fr); width: 100%; height: 100%; }
-        .tile { width: 50px; height: 50px; }
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.5s; }
+        .pokedex-box { border: 4px solid #fff; padding: 2rem; background: var(--ui-bg); text-align: center; }
         
-        /* Terrain Definitions (Base64 SVG) */
-        .water { background-color: #4da6ff; }
-        .water::before { content:''; display: block; width:100%; height:100%; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PHBhdGggZD0iTTAgMGg1MHY1MEgwWiIgZmlsbD0iIzRkYTZmZiIvPjxwYXRoIGQ9Ik0yNSA1MGMtNi42MjggMC0xMi01LjM3Mi0xMi0xMlMyMC4zNzIgMjUgMjUgMjVzMTIgNS4zNzIgMTIgMTJzLTUuMzcyIDEyLTEyIDEyWiIgZmlsbD0iIzMwN2Y5YiIvPjxwYXRoIGQ9Ik0zNSA1MGMtNi42MjggMC0xMi01LjM3Mi0xMi0xMlMzMC4zNzIgMjUgMzUgMjVzMTIgNS4zNzIgMTIgMTJzLTUuMzcyIDEyLTEyIDEyWiIgZmlsbD0iIzMwN2Y5YiIvPjxwYXRoIGQ9Ik0yNSA0NWMtNC45NyAwLTktNC4wMy05LTlzNC4wMy05IDktOXM5IDQuMDMgOSA5cy00LjAzIDktOSA5WiIgZmlsbD0iIzRkYTZmZiIvPjxwYXRoIGQ9Ik0zNSA0NWMtNC45NyAwLTktNC4wMy05LTlzNC4wMy05IDktOXM5IDQuMDMgOSA5cy00LjAzIDktOSA5WiIgZmlsbD0iIzRkYTZmZiIvPjwvc3ZnPg=='); background-size: cover; }
+        #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; background: var(--grass); overflow: hidden; }
         
-        .sand { background-color: #f7e1ac; }
-        .grass { background-color: #a0d67d; }
-        .path_dirt { background-color: #cdb293; }
-        .path_stone { background-color: #ddd; }
+        #map { position: absolute; bottom: 0; left: 0; width: 100%; height: 500vh; background-image: radial-gradient(var(--grass-dark) 10%, transparent 11%); background-size: 30px 30px; }
         
-        /* Object Layer (Absolute Positioning) */
-        .object-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .obj { position: absolute; background-size: contain; background-repeat: no-repeat; }
+        .forest-wall { position: absolute; top: 0; height: 100%; width: 15vw; background-image: radial-gradient(circle, var(--tree-leaf) 60%, transparent 60%); background-size: 50px 50px; border-right: 6px solid var(--tree-shadow); }
+        .forest-wall.right { right: 0; left: auto; border-right: none; border-left: 6px solid var(--tree-shadow); }
+        
+        .route-path { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 100%; background: var(--path); border-left: 6px solid var(--path-border); border-right: 6px solid var(--path-border); }
 
-        /* Objects (Base64 SVG) */
-        .obj.tree_palm_type1 { width: 60px; height: 90px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCA5MCI+PHBhdGggZD0iTTI3LjUgMzUgSCAzMi41IEMgNDAgNjAgNDAgODkgMzAgODkgQyAyMCA4OSAyMCA2MCAyNy41IDM1IFoiIGZpbGw9IiM4QjdGNDMiLz48cGF0aCBkPSJNMjAgMjAgTCAzMCAwIEwgNDAgMjAgTCAzMCAxMCBaIiBmaWxsPSIjMkQ3MjQwIi8+PHBhdGggZD0iTTMwIDIwIEMgNDAgMTUgNTAgMzUgNTAgNDAgQyA0NSA0NSA0MCA1MCAzMCA1MCBaIiBmaWxsPSIjMkQ3MjQwIi8+PHBhdGggZD0iTTMwIDIwIEMgMjAgMTUgMTAgMzUgMTAgNDAgQyA1IDQ1IDEwIDUwIDIwIDUwIFoiIGZpbGw9IiMyRDcyNDAiLz48cGF0aCBkPSJNMjAgMTUgQyAyNSAxMCAzNSA1IDM1IDEwIEMgNDUgMTUgNDAgMjAgMzAgMjAgWiIgZmlsbD0iIzMkOEM1RCIvPjxwYXRoIGQ9Ik00MCAxNSBDIDM1IDEwIDI1IDUgMjUgMTAgQyAxNSAxNSAyMCAyMCAzMCAyMCBaIiBmaWxsPSIjM2NDNUQiLz48L3N2Zz4='); }
-        .obj.tree_pine { width: 60px; height: 90px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCA5MCI+PHBhdGggZD0iTTI3LjUgNTUgSCAzMi41IEMgNDAgNzUgNDAgODkgMzAgODkgQyAyMCA4OSAyMCA3NSAyNy41IDU1IFoiIGZpbGw9IiM2NTRhMjEiLz48cGF0aCBkPSJNIDMwIDAgbCAyNSA1MCBIIDM1IEMgMzAgNDAgMzAgNDAgMzAgNDAgQyAzMCA0MCAzMCA0MCAzMCA0MCAWiIgZmlsbD0iIjIzM2UyMCIvPjxwYXRoIGQ9IkwgMzAgMCBsLTI1IDUwIEggMjUgQyAzMCA0MCAzMCA0MCAzMCA0MCBDIDMwIDQwIDMwIDQwIDMwIDQwIFoiIGZpbGw9IiMyMzNlMjAiLz48L3N2Zz4='); }
-        .obj.tree_cherry { width: 60px; height: 90px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MCA5MCI+PHBhdGggZD0iTTI3LjUgNTUgSCAzMi41IEMgNDAgNzUgNDAgODkgMzAgODkgQyAyMCA4OSAyMCA3NSAyNy41IDU1IFoiIGZpbGw9IiM2NTRhMjEiLz48cGF0aCBkPSJNMzAgMjBDNDAgMjAgNTAgNDAgNTAgNTBDNDUgNjAgMzUgNjAgMjUgNjBDMTUgNjAgMTAgNDAgMjAgMjBaIiBmaWxsPSIjZjc4YmMxIi8+PHBhdGggZD0iTTEwIDcwTDYwIDEwTDAgNTBaIiBmaWxsPSIjZjg5ZTUwIi8+PHBhdGggZD0iTTI1IDgwTDUwIDI1TDEwIDY1WiIgZmlsbD0iI2ZjYjYwMSIvPjwvc3ZnPg=='); }
-        
-        .obj.home { width: 150px; height: 100px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAgMTAwIj48cGF0aCBkPSJNIDI1IDUwIEggMTI1IFYgODAgSCAyNSBaIiBmaWxsPSIjYzk3MTM0Ii8+PHBhdGggZD0iTTE1IDQ1TDEzNSA0NUwxMzU1NUwxNTU1WiIgZmlsbD0iIzk5NWMzNyIvPjxwYXRoIGQ9Ik0xNSA0NUw4MCAwTDEzNSA0NUwxMzU1NUwxNTU1WiIgZmlsbD0iIzRlN2FjYyIvPjxwYXRoIGQ9Ik0wIDEwMEgxNTBWMGgwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTI5IDIwSDU5VjcwSDI5WiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTI5IDIwSDU5VjcwSDI5WiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTI5IDIwSDU5VjcwSDI5WiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTI5IDIwSDU5VjcwSDI5WiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PC9zdmc+'); }
-        
-        .obj.sailboat { width: 150px; height: 100px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAgMTAwIj48cGF0aCBkPSJNMDAgODBIMTUwTDEzNSAxMDBIMTVaIiBmaWxsPSIjNjU0MTI0Ii8+PHBhdGggZD0iTTMwIDIwSDg1VjcwSDMwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik04NSAxMDBIMTMwTDQwIDAwSDEwVjAwSDhWMDBIOFYxMDBIMTAwWiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0xMzAgMjBIMTU1VjcwSDEzMFoiIGZpbGw9IiMwOTUzYjMiLz48L3N2Zz4='); }
-        .obj.rowboat { width: 70px; height: 40px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MCA0MCI+PHBhdGggZD0iTTAgMzBIMTBMNjAgNDBMNTAgNDBIMTVaIiBmaWxsPSIjNjU0MTI0Ii8+PHBhdGggZD0iTTEwIDMwTDQwIDIwTDcwIDMwTDYwIDQwSDE1WiIgZmlsbD0iIzk5NWMzNyIvPjwvc3ZnPg=='); }
-        .obj.service_boat { width: 100px; height: 60px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgNjAiPjxwYXRoIGQ9Ik0wIDUwSDEwMEw5NSA2MEg1WiIgZmlsbD0iIzk5NWMzNyIvPjxwYXRoIGQ9Ik0xMCAwSDEwMFY1MEgxMFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNMTAgMEgxMDBWMDBIMTBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTEwIDEwSDMwVjQwSDEwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTUwIDEwSDcwVjQwSDUwWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIi8+PHBhdGggZD0iTTkwIDEwSDEwMFY0MEg5MFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIvPjwvc3ZnPg=='); }
-        
-        .obj.cave { width: 100px; height: 100px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNIDUwIDAgbCA0MCA1MCBIIDEwIFoiIGZpbGw9IiMzMzMiLz48cGF0aCBkPSJNIDEwIDUwIGggODAgdjUgMzAgSCAxMCBaIiBmaWxsPSIjNDQ0Ii8+PHBhdGggZD0iTSAwIDMwIGggMTAwIHYgMzAgaCAtMTAwIFoiIGZpbGw9IiM2NjYiLz48cGF0aCBkPSJNIDEwIDEwMCBoIDgwIFYgNzAgSCAxMCBaIiBmaWxsPSIjZmZmIi8+PC9zdmc+'); }
-        .obj.lighthouse { width: 100px; height: 180px; background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTgwIj48cGF0aCBkPSJNIDUwIDAgbCA1MCA1MCBoIC0xMDAgWiIgZmlsbD0iIzJlNmVjNCIvPjxwYXRoIGQ9Ik0gMCA0MCBIIDEwMCBWIDE4MCBIIDAgWiIgZmlsbD0iIzJlNmVjNCIvPjxwYXRoIGQ9Ik0gMTAgNTAgSCA5MCBWIDE3MCBIIDEwIFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNIDI5IDgwIEggNzkgViAxMTkgSCAyOSBaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTSAyOSAxMzAgSCA3OSBWIDE2OSBIIDI5IFoiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNIDMwIDYwIEggNzAgViA5OSBIIDMwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIvPjxwYXRoIGQ9Ik0gMzAgMTAwIEggNzAgViAxMzkgSCAzMCBaIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiLz48cGF0aCBkPSJNIDQwIDIwIEggNjAgViA0OSBIIDQwIFoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIvPjwvc3ZnPg=='); }
+        /* THE ISLAND */
+        .env-island { position: absolute; left: calc(50% - 320px); bottom: 20vh; width: 220px; height: 180px; z-index: 5; }
+        .water-body { position: absolute; width: 100%; height: 100%; background: var(--water-deep); border-radius: 30% 70% 50% 50% / 50% 30% 70% 50%; border: 4px solid var(--water-foam); overflow: hidden; }
+        .water-body::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background-image: linear-gradient(0deg, transparent 45%, var(--water-foam) 50%, transparent 55%); background-size: 100% 40px; animation: waveMove 6s linear infinite; opacity: 0.3; }
+        @keyframes waveMove { from { transform: translateY(0); } to { transform: translateY(40px); } }
+        .sand-patch { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 110px; height: 85px; background: var(--sand); border-radius: 40% 60% 60% 40% / 50% 50% 50% 50%; border: 3px solid #d97706; }
+        .pixel-tree { position: absolute; top: -35px; left: 25px; }
+        .pixel-trunk { width: 16px; height: 45px; background: var(--trunk); border: 3px solid #451a03; }
+        .pixel-leaves { position: absolute; top: -45px; left: -25px; width: 70px; height: 70px; background: var(--tree-leaf); border: 4px solid var(--tree-shadow); border-radius: 50% 50% 40% 40%; animation: treeSway 3s ease-in-out infinite alternate; }
+        @keyframes treeSway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+        /* DECAY POINTS */
+        .poi-building { position: absolute; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: #fff; border: 4px solid #000; border-radius: 8px 8px 0 0; display: flex; align-items: flex-end; justify-content: center; box-shadow: 10px 10px 0 rgba(0,0,0,0.2); z-index: 10; }
+        .poi-building::after { content: ''; width: 20px; height: 30px; background: #000; display: block; }
+        .poi-sign { position: absolute; left: calc(50% + 90px); width: 100px; padding: 5px; background: #fff; color: #000; border: 2px solid #000; font-size: 0.8rem; text-align: center; margin-top: 20px; z-index: 10; }
+        #cp-0 { bottom: 20vh; } #cp-1 { bottom: 120vh; } #cp-2 { bottom: 220vh; } #cp-3 { bottom: 320vh; }
+
+        /* UI */
+        #player { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 36px; background: #ef4444; border: 3px solid #000; border-radius: 14px 14px 0 0; z-index: 50; }
+        #player::after { content: ''; display: block; width: 18px; height: 18px; background: #fee2e2; border-radius: 50%; margin: 4px auto; }
+        #dialog-box { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; height: 120px; background: #fff; color: #000; border: 6px solid #000; padding: 1rem; display: none; z-index: 60; box-sizing: border-box; }
+        #dialog-text { font-family: var(--font-logo); font-size: 1rem; line-height: 1.5; }
+        #scroll-proxy { height: 500vh; width: 100%; position: absolute; top: 0; pointer-events: none; }
     </style>
 </head>
 <body>
-    <div class="rpg-map-container">
-        <div class="grid-layer">
-            <div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div>
-            <div class="tile water"></div><div class="tile water"></div><div class="tile sand"></div><div class="tile sand"></div><div class="tile sand"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div><div class="tile water"></div>
-        </div>
 
-        <div class="object-layer">
-            <div class="obj home" style="top: 450px; left: 425px;"></div>
-            <div class="obj cave" style="top: 350px; left: 650px;"></div>
-            <div class="obj tree_pine" style="top: 300px; left: 400px;"></div>
-            <div class="obj tree_cherry" style="top: 320px; left: 460px;"></div>
-            <div class="obj tree_pine" style="top: 350px; left: 350px;"></div>
-            <div class="obj tree_cherry" style="top: 380px; left: 500px;"></div>
-            <div class="obj tree_palm_type1" style="top: 550px; left: 300px;"></div>
-            <div class="obj tree_palm_type1" style="top: 570px; left: 360px;"></div>
-            <div class="obj tree_palm_type1" style="top: 600px; left: 250px;"></div>
-            <div class="obj sailboat" style="top: 750px; left: 200px;"></div>
-            <div class="obj rowboat" style="top: 780px; left: 600px;"></div>
-            <div class="obj lighthouse" style="top: 200px; left: 850px;"></div>
-            <div class="obj service_boat" style="top: 350px; left: 880px;"></div>
-            <div class="tile path_stone obj" style="top: 500px; left: 500px; width: 50px; height: 50px; border:none; background-size:cover; background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MCA1MCI+PHBhdGggZD0iTTAgMGg1MHY1MEgwWiIgZmlsbD0iI2FwZDY3ZCIvPjxwYXRoIGQ9Ik0xNSAxNWgzMHYyMEgxNVoiIGZpbGw9IiNkZGQiLz48cGF0aCBkPSJNMjAgMjBoMjB2MTBIMjBaIiBmaWxsPSIjY2NjIi8+PC9zdmc+');"></div>
-        </div>
+<div id="boot-screen" onclick="startGame()">
+    <div class="pokedex-box">
+        <h2>DEXDOGS_OS v2.3 (Restored)</h2>
+        <p>[ INITIALIZE WORLD ]</p>
     </div>
+</div>
+
+<div id="game-container">
+    <div id="map">
+        <div class="forest-wall"></div>
+        <div class="forest-wall right"></div>
+        <div class="env-island">
+            <div class="water-body"></div>
+            <div class="sand-patch"><div class="pixel-tree"><div class="pixel-leaves"></div><div class="pixel-trunk"></div></div></div>
+        </div>
+        <div class="route-path"></div>
+        <div class="poi-building" id="cp-0"><div class="poi-sign">00-10</div></div>
+        <div class="poi-building" id="cp-1"><div class="poi-sign">11-20</div></div>
+        <div class="poi-building" id="cp-2"><div class="poi-sign">21-30</div></div>
+        <div class="poi-building" id="cp-3"><div class="poi-sign">31-40</div></div>
+    </div>
+    <div id="player"></div>
+    <div id="dialog-box"><div id="dialog-text">...</div></div>
+</div>
+
+<div id="scroll-proxy"></div>
+
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    const dialogs = [
+        "Foundational years. Early curiosity in environmental systems.",
+        "Academic foundations at MIT. Initial technical engineering.",
+        "Research Scientist tenure. Deep focus on carbon markets at NREL.",
+        "Founder era. Launching dexdogs to fix environmental data."
+    ];
+
+    function startGame() {
+        document.getElementById('boot-screen').style.opacity = 0;
+        setTimeout(() => {
+            document.getElementById('boot-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            initScroll();
+        }, 500);
+    }
+
+    function initScroll() {
+        gsap.to("#map", {
+            y: "400vh", ease: "none",
+            scrollTrigger: { trigger: "#scroll-proxy", start: "top top", end: "bottom bottom", scrub: true }
+        });
+
+        [20, 120, 220, 320].forEach((pos, index) => {
+            ScrollTrigger.create({
+                trigger: "#scroll-proxy", start: `${pos - 10}vh center`, end: `${pos + 10}vh center`,
+                onEnter: () => showDialog(index), onEnterBack: () => showDialog(index),
+                onLeave: hideDialog, onLeaveBack: hideDialog
+            });
+        });
+    }
+
+    function showDialog(index) {
+        document.getElementById('dialog-text').innerText = dialogs[index];
+        document.getElementById('dialog-box').style.display = 'block';
+    }
+    function hideDialog() { document.getElementById('dialog-box').style.display = 'none'; }
+</script>
 </body>
 </html>
