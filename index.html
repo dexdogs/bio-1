@@ -3,90 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ankur Podder | Bio v3.1</title>
+    <title>Ankur Podder | Bio v3.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         @font-face { font-family: 'BPdots'; src: url('./BPdots.otf'); }
         :root { 
-            --grass: #5ac54f; --grass-dark: #306230; --path: #debb7b; --path-border: #b89056; 
-            --tree-leaf: #2d7a22; --tree-shadow: #1b5212; --trunk: #8b5a2b;
-            --water-deep: #2563eb; --water-foam: #60a5fa; --sand: #fde68a; --ui-bg: #121212;
+            --path: rgba(222, 187, 123, 0.7); /* Translucent path */
+            --path-border: #b89056;
+            --ui-bg: #121212;
         }
         body, html { margin: 0; background: #000; overflow-x: hidden; font-family: 'BPdots', monospace; color: #fff; }
         
-        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.5s; }
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .pokedex-box { border: 4px solid #fff; padding: 2rem; background: var(--ui-bg); text-align: center; }
-        
-        #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; background: var(--grass); overflow: hidden; }
-        
-        /* --- FLASHBACK BACKGROUND (ROOTS) --- */
-        #roots-flashback {
+
+        /* --- THE UNDERLAY (ROOTS IMAGE) --- */
+        #roots-bg-layer {
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
+            width: 100%; height: 100vh;
             background: url('roots-background.png') no-repeat center center;
             background-size: cover;
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-            pointer-events: none;
+            z-index: 1;
+            opacity: 1;
         }
 
-        /* Pulse Animation for Trees */
-        .tree-pulse {
+        /* --- THE OVERWORLD (GBA ROUTE) --- */
+        #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; overflow: hidden; }
+        
+        #map { position: absolute; top: 0; left: 0; width: 100%; height: 500vh; }
+        
+        .route-path { 
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%); 
+            width: 140px; height: 100%; 
+            background: var(--path); 
+            border-left: 6px solid var(--path-border); 
+            border-right: 6px solid var(--path-border);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* The Starting House */
+        .start-house {
             position: absolute;
-            width: 150px; height: 150px;
-            background: radial-gradient(circle, rgba(147, 51, 234, 0.3) 0%, transparent 70%);
-            border-radius: 50%;
-            mix-blend-mode: screen;
-            animation: pulseLight 4s infinite alternate;
+            top: 5vh; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 100px;
+            background: #fff; border: 6px solid #000;
+            z-index: 15;
         }
-        #pulse-1 { top: 20%; left: 15%; }
-        #pulse-2 { top: 10%; right: 20%; }
-
-        @keyframes pulseLight { from { opacity: 0.2; transform: scale(1); } to { opacity: 0.6; transform: scale(1.1); } }
-
-        /* Moving Water Overlay */
-        .water-overlay {
-            position: absolute;
-            bottom: 0; width: 100%; height: 30%;
-            background: linear-gradient(transparent, rgba(37, 99, 235, 0.2));
-            overflow: hidden;
-        }
-        .wave-line {
-            position: absolute;
-            width: 200%; height: 2px;
-            background: rgba(255, 255, 255, 0.3);
-            animation: waveSlide 8s linear infinite;
-        }
-        @keyframes waveSlide { from { transform: translateX(-50%); } to { transform: translateX(0%); } }
-
-        /* Drifting Boat */
-        .drifting-boat {
-            position: absolute;
-            bottom: 15%; left: 20%;
-            width: 40px; height: 20px;
-            background: #451a03;
-            border-radius: 0 0 10px 10px;
-            animation: boatDrift 15s ease-in-out infinite alternate;
-        }
-        @keyframes boatDrift { 
-            from { transform: translateX(0) rotate(-2deg); } 
-            to { transform: translateX(100px) rotate(2deg); } 
+        .door {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 40px; background: #000;
         }
 
-        /* --- STABLE GBA MAP --- */
-        #map { position: absolute; bottom: 0; left: 0; width: 100%; height: 500vh; background-image: radial-gradient(var(--grass-dark) 10%, transparent 11%); background-size: 30px 30px; z-index: 10; }
-        .forest-wall { position: absolute; top: 0; height: 100%; width: 15vw; background-image: radial-gradient(circle, var(--tree-leaf) 60%, transparent 60%); background-size: 50px 50px; border-right: 6px solid var(--tree-shadow); }
-        .forest-wall.right { right: 0; left: auto; border-left: 6px solid var(--tree-shadow); }
-        .route-path { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 100%; background: var(--path); border-left: 6px solid var(--path-border); border-right: 6px solid var(--path-border); }
-        .poi-sign { position: absolute; left: calc(50% + 90px); width: 100px; padding: 5px; background: #fff; color: #000; border: 2px solid #000; font-size: 0.8rem; text-align: center; margin-top: 20px; }
-        #cp-0 { bottom: 20vh; position: absolute; left: 50%; transform: translateX(-50%); }
+        /* DECADE LABELS */
+        .poi-sign { position: absolute; left: calc(50% + 90px); width: 120px; padding: 8px; background: #fff; color: #000; border: 3px solid #000; font-size: 0.9rem; text-align: center; }
+        #cp-0 { top: 20vh; position: absolute; left: 50%; transform: translateX(-50%); }
+        #cp-1 { top: 120vh; position: absolute; left: 50%; transform: translateX(-50%); }
+        #cp-2 { top: 220vh; position: absolute; left: 50%; transform: translateX(-50%); }
+        #cp-3 { top: 320vh; position: absolute; left: 50%; transform: translateX(-50%); }
 
+        /* PLAYER */
         #player { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 36px; background: #ef4444; border: 3px solid #000; border-radius: 14px 14px 0 0; z-index: 50; }
         #player::after { content: ''; display: block; width: 18px; height: 18px; background: #fee2e2; border-radius: 50%; margin: 4px auto; }
+        
+        /* UI */
         #dialog-box { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; height: 120px; background: #fff; color: #000; border: 6px solid #000; padding: 1rem; display: none; z-index: 60; box-sizing: border-box; }
         #scroll-proxy { height: 500vh; width: 100%; position: absolute; top: 0; pointer-events: none; }
     </style>
@@ -95,27 +77,22 @@
 
 <div id="boot-screen" onclick="startGame()">
     <div class="pokedex-box">
-        <h2>DEXDOGS_OS v3.1</h2>
-        <p>[ INITIALIZE WORLD ]</p>
+        <h2>DEXDOGS_OS v3.3</h2>
+        <p>[ EXIT HOUSE & START JOURNEY ]</p>
     </div>
 </div>
 
-<div id="roots-flashback">
-    <div class="tree-pulse" id="pulse-1"></div>
-    <div class="tree-pulse" id="pulse-2"></div>
-    <div class="water-overlay">
-        <div class="wave-line" style="top:20%"></div>
-        <div class="wave-line" style="top:60%; animation-delay: -4s;"></div>
-    </div>
-    <div class="drifting-boat"></div>
-</div>
+<div id="roots-bg-layer"></div>
 
 <div id="game-container">
     <div id="map">
-        <div class="forest-wall"></div>
-        <div class="forest-wall right"></div>
         <div class="route-path"></div>
+        <div class="start-house"><div class="door"></div></div>
+        
         <div id="cp-0"><div class="poi-sign">00-10: ROOTS</div></div>
+        <div id="cp-1"><div class="poi-sign">11-20: GROWTH</div></div>
+        <div id="cp-2"><div class="poi-sign">21-30: MASTERY</div></div>
+        <div id="cp-3"><div class="poi-sign">31-40: FOUNDER</div></div>
     </div>
     <div id="player"></div>
     <div id="dialog-box"><div id="dialog-text">...</div></div>
@@ -125,6 +102,13 @@
 
 <script>
     gsap.registerPlugin(ScrollTrigger);
+
+    const dialogs = [
+        "You've stepped out into the world. Early curiosity in environmental systems begins here.",
+        "The path sharpens. Academic foundations at MIT and technical engineering peaks.",
+        "Deep into the forest of data. Researching carbon markets and LCA at NREL.",
+        "The destination comes into view. Founding dexdogs to fix the data layer."
+    ];
 
     function startGame() {
         document.getElementById('boot-screen').style.opacity = 0;
@@ -136,34 +120,36 @@
     }
 
     function initScroll() {
-        // Move GBA Map
+        // Move GBA map UP
         gsap.to("#map", {
-            y: "400vh", ease: "none",
+            y: "-400vh", ease: "none",
             scrollTrigger: { trigger: "#scroll-proxy", start: "top top", end: "bottom bottom", scrub: true }
         });
 
-        // ROOTS FLASHBACK TRIGGER (Option A)
-        ScrollTrigger.create({
-            trigger: "#scroll-proxy",
-            start: "0% top",
-            end: "25% top",
-            onEnter: () => showFlashback(),
-            onLeave: () => hideFlashback(),
-            onEnterBack: () => showFlashback(),
-            onLeaveBack: () => hideFlashback()
+        // Fade out the roots image as we move away from 00-10
+        gsap.to("#roots-bg-layer", {
+            opacity: 0,
+            scrollTrigger: { trigger: "#scroll-proxy", start: "15% top", end: "30% top", scrub: true }
+        });
+
+        [0, 25, 50, 75].forEach((pos, index) => {
+            ScrollTrigger.create({
+                trigger: "#scroll-proxy",
+                start: `${pos}% top`,
+                end: `${pos + 25}% top`,
+                onEnter: () => showDialog(index),
+                onEnterBack: () => showDialog(index),
+                onLeave: hideDialog,
+                onLeaveBack: hideDialog
+            });
         });
     }
 
-    function showFlashback() {
-        document.getElementById('roots-flashback').style.opacity = 1;
-        document.getElementById('dialog-text').innerText = "Flashback: Early curiosity in environmental systems and mapping.";
+    function showDialog(index) {
+        document.getElementById('dialog-text').innerText = dialogs[index];
         document.getElementById('dialog-box').style.display = 'block';
     }
-
-    function hideFlashback() {
-        document.getElementById('roots-flashback').style.opacity = 0;
-        document.getElementById('dialog-box').style.display = 'none';
-    }
+    function hideDialog() { document.getElementById('dialog-box').style.display = 'none'; }
 </script>
 </body>
 </html>
