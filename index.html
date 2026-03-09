@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ankur Podder | Bio v3.4.1</title>
+    <title>Ankur Podder | Bio v3.4.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -19,33 +19,39 @@
         /* --- POKEDEX LANDING BOOT --- */
         #boot-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 100; 
+            background: #000; z-index: 1000; 
             display: flex; align-items: center; justify-content: center; 
             transition: opacity 1s ease-in-out, transform 1s ease-in-out;
         }
         .pokedex-hardware {
             position: relative;
-            width: 90vmin; height: 90vmin;
+            width: 800px; height: 800px; /* Using fixed px for precise hitbox mapping */
+            max-width: 95vw; max-height: 95vh;
             background: url('pokedex.png') no-repeat center center;
             background-size: contain;
             display: flex; align-items: center; justify-content: center;
         }
         .pokedex-screen-hitbox {
             position: absolute;
-            top: 68%; left: 45.5%; /* Adjusted for PNG specific alignment */
+            top: 72%; left: 45.2%; /* Precise screen mapping for pokedex.png */
             transform: translate(-50%, -50%);
-            width: 32%; height: 25%;
+            width: 250px; height: 180px;
+            max-width: 30%; max-height: 22%;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             text-align: center;
+            z-index: 1001;
+            background: rgba(0,255,0,0.05);
         }
         .boot-text {
-            font-size: 0.7rem; color: #0f0; text-shadow: 0 0 5px #0f0;
+            font-size: 0.9rem; color: #0f0; text-shadow: 0 0 8px #0f0;
             animation: blink 1.5s infinite;
-            line-height: 1.2;
+            line-height: 1.4;
+            pointer-events: none;
         }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
+        /* --- BACKGROUND LAYERS --- */
         #roots-bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background: url('roots-background.png') no-repeat center center;
@@ -59,7 +65,10 @@
             width: 140px; height: 100%; background: var(--path); 
             border-left: 6px solid var(--path-border); border-right: 6px solid var(--path-border);
         }
-        .start-house { position: absolute; top: 5vh; left: 50%; transform: translateX(-50%); width: 120px; height: 100px; background: #fff; border: 6px solid #000; z-index: 15; }
+        .start-house { 
+            position: absolute; top: 10vh; left: 50%; transform: translateX(-50%); 
+            width: 120px; height: 100px; background: #fff; border: 6px solid #000; z-index: 15; 
+        }
         .door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #000; }
         
         #player { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 36px; background: #ef4444; border: 3px solid #000; border-radius: 14px 14px 0 0; z-index: 50; }
@@ -73,8 +82,8 @@
 
 <div id="boot-screen">
     <div class="pokedex-hardware">
-        <div class="pokedex-screen-hitbox" onclick="startGame()">
-            <div class="boot-text">DEXDOGS_OS<br>v3.4.1<br><br>[ CLICK SCREEN ]<br>TO BOOT</div>
+        <div class="pokedex-screen-hitbox" id="start-trigger">
+            <div class="boot-text">SYSTEM READY<br>[ TAP SCREEN ]<br>TO INITIALIZE</div>
         </div>
     </div>
 </div>
@@ -95,10 +104,12 @@
 <script>
     gsap.registerPlugin(ScrollTrigger);
 
+    document.getElementById('start-trigger').addEventListener('click', startGame);
+
     function startGame() {
         const boot = document.getElementById('boot-screen');
         boot.style.opacity = 0;
-        boot.style.transform = "scale(1.5)";
+        boot.style.transform = "scale(1.8)";
         
         setTimeout(() => {
             boot.style.display = 'none';
@@ -115,7 +126,7 @@
 
         gsap.to("#roots-bg-layer", {
             opacity: 0,
-            scrollTrigger: { trigger: "#scroll-proxy", start: "15% top", end: "30% top", scrub: true }
+            scrollTrigger: { trigger: "#scroll-proxy", start: "10% top", end: "25% top", scrub: true }
         });
     }
 </script>
