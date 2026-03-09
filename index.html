@@ -3,74 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ankur Podder | Bio v3.4.2</title>
+    <title>Ankur Podder | Bio v3.4.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         @font-face { font-family: 'BPdots'; src: url('./BPdots.otf'); }
         :root { 
-            --path: rgba(222, 187, 123, 0.7);
+            --path: rgba(222, 187, 123, 0.6);
             --path-border: #b89056;
             --ui-bg: #121212;
+            --purple-glow: rgba(147, 51, 234, 0.4);
         }
         body, html { margin: 0; background: #000; overflow-x: hidden; font-family: 'BPdots', monospace; color: #fff; }
         
-        /* --- POKEDEX LANDING BOOT --- */
+        /* POKEDEX LANDING */
         #boot-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 1000; 
             display: flex; align-items: center; justify-content: center; 
-            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            transition: opacity 1s, transform 1s;
         }
         .pokedex-hardware {
-            position: relative;
-            width: 800px; height: 800px; /* Using fixed px for precise hitbox mapping */
-            max-width: 95vw; max-height: 95vh;
-            background: url('pokedex.png') no-repeat center center;
-            background-size: contain;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; width: 800px; height: 800px; max-width: 95vw; max-height: 95vh;
+            background: url('pokedex.png') no-repeat center center; background-size: contain;
         }
         .pokedex-screen-hitbox {
-            position: absolute;
-            top: 72%; left: 45.2%; /* Precise screen mapping for pokedex.png */
-            transform: translate(-50%, -50%);
-            width: 250px; height: 180px;
-            max-width: 30%; max-height: 22%;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            text-align: center;
-            z-index: 1001;
-            background: rgba(0,255,0,0.05);
+            position: absolute; top: 72%; left: 45.2%; transform: translate(-50%, -50%);
+            width: 250px; height: 180px; max-width: 30%; max-height: 22%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1001;
         }
-        .boot-text {
-            font-size: 0.9rem; color: #0f0; text-shadow: 0 0 8px #0f0;
-            animation: blink 1.5s infinite;
-            line-height: 1.4;
-            pointer-events: none;
-        }
+        .boot-text { font-size: 0.9rem; color: #0f0; text-shadow: 0 0 8px #0f0; animation: blink 1.5s infinite; text-align: center; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-        /* --- BACKGROUND LAYERS --- */
-        #roots-bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: url('roots-background.png') no-repeat center center;
-            background-size: cover; z-index: 1;
+        /* ROOTS ENVIRONMENT LAYER */
+        #roots-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100vh;
+            background: url('roots-background.png') no-repeat center center; background-size: cover;
+            z-index: 5;
         }
+        .tree-pulse {
+            position: absolute; width: 200px; height: 200px;
+            background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+            mix-blend-mode: screen; animation: pulse 4s infinite alternate;
+        }
+        #pulse-1 { top: 30%; left: 20%; }
+        #pulse-2 { top: 20%; right: 25%; }
+        @keyframes pulse { from { opacity: 0.2; transform: scale(1); } to { opacity: 0.7; transform: scale(1.2); } }
 
-        #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; overflow: hidden; }
+        .water-waves {
+            position: absolute; bottom: 0; width: 100%; height: 40%;
+            background: linear-gradient(transparent, rgba(37, 99, 235, 0.1));
+            overflow: hidden;
+        }
+        .wave {
+            position: absolute; width: 200%; height: 4px; background: rgba(255, 255, 255, 0.2);
+            animation: waveFlow 10s linear infinite;
+        }
+        @keyframes waveFlow { from { transform: translateX(-50%); } to { transform: translateX(0%); } }
+
+        /* OVERWORLD */
+        #game-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 10; }
         #map { position: absolute; top: 0; left: 0; width: 100%; height: 500vh; }
         .route-path { 
             position: absolute; top: 0; left: 50%; transform: translateX(-50%); 
             width: 140px; height: 100%; background: var(--path); 
             border-left: 6px solid var(--path-border); border-right: 6px solid var(--path-border);
+            z-index: 10;
         }
         .start-house { 
-            position: absolute; top: 10vh; left: 50%; transform: translateX(-50%); 
-            width: 120px; height: 100px; background: #fff; border: 6px solid #000; z-index: 15; 
+            position: absolute; top: 5vh; left: 50%; transform: translateX(-50%); 
+            width: 130px; height: 110px; background: #fff; border: 6px solid #000; z-index: 20; 
         }
-        .door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 40px; background: #000; }
-        
+        .door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 34px; height: 44px; background: #000; }
+
         #player { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28px; height: 36px; background: #ef4444; border: 3px solid #000; border-radius: 14px 14px 0 0; z-index: 50; }
         #player::after { content: ''; display: block; width: 18px; height: 18px; background: #fee2e2; border-radius: 50%; margin: 4px auto; }
         
@@ -82,16 +88,19 @@
 
 <div id="boot-screen">
     <div class="pokedex-hardware">
-        <div class="pokedex-screen-hitbox" id="start-trigger">
-            <div class="boot-text">SYSTEM READY<br>[ TAP SCREEN ]<br>TO INITIALIZE</div>
+        <div class="pokedex-screen-hitbox" id="start-btn">
+            <div class="boot-text">ROOTS_OS v3.4.3<br>[ TAP TO START ]</div>
         </div>
     </div>
 </div>
 
-<div id="roots-bg-layer"></div>
-
 <div id="game-container">
     <div id="map">
+        <div id="roots-container">
+            <div class="tree-pulse" id="pulse-1"></div>
+            <div class="tree-pulse" id="pulse-2"></div>
+            <div class="water-waves"><div class="wave" style="top:20%"></div><div class="wave" style="top:50%; animation-delay:-5s"></div></div>
+        </div>
         <div class="route-path"></div>
         <div class="start-house"><div class="door"></div></div>
     </div>
@@ -104,31 +113,41 @@
 <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    document.getElementById('start-trigger').addEventListener('click', startGame);
-
-    function startGame() {
+    document.getElementById('start-btn').addEventListener('click', () => {
         const boot = document.getElementById('boot-screen');
         boot.style.opacity = 0;
-        boot.style.transform = "scale(1.8)";
-        
+        boot.style.transform = "scale(2)";
         setTimeout(() => {
             boot.style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
-            initScroll();
+            initJourney();
         }, 1000);
-    }
+    });
 
-    function initScroll() {
+    function initJourney() {
         gsap.to("#map", {
             y: "-400vh", ease: "none",
             scrollTrigger: { trigger: "#scroll-proxy", start: "top top", end: "bottom bottom", scrub: true }
         });
 
-        gsap.to("#roots-bg-layer", {
+        gsap.to("#roots-container", {
             opacity: 0,
             scrollTrigger: { trigger: "#scroll-proxy", start: "10% top", end: "25% top", scrub: true }
         });
+
+        ScrollTrigger.create({
+            trigger: "#scroll-proxy", start: "0% top", end: "20% top",
+            onEnter: () => showMsg("You have emerged from the roots. The journey south begins."),
+            onLeave: hideMsg, onEnterBack: () => showMsg("You have emerged from the roots. The journey south begins."),
+            onLeaveBack: hideMsg
+        });
     }
+
+    function showMsg(txt) {
+        document.getElementById('dialog-text').innerText = txt;
+        document.getElementById('dialog-box').style.display = 'block';
+    }
+    function hideMsg() { document.getElementById('dialog-box').style.display = 'none'; }
 </script>
 </body>
 </html>
