@@ -163,9 +163,9 @@
             border-right: 3px solid #111;
             border-bottom: 3px solid #111;
         }
-        #bubble-landing { top: calc(50% - 200px); }
-        #bubble-scroll  { top: calc(50% - 200px); }
-        #bubble-pan     { top: calc(50% - 200px); }
+        #bubble-landing { top: calc(50% - 120px); }
+        #bubble-scroll  { top: calc(50% - 120px); }
+        #bubble-pan     { top: calc(50% - 120px); }
     </style>
 </head>
 <body>
@@ -279,6 +279,12 @@
     let scrollBubbleTimer = null;
 
     // Wheel — scroll cards and background together, switch stripe boy
+    function clampCardsScroll() {
+        const { h } = getImgSize();
+        const maxScroll = Math.max(0, cardsPanel.scrollHeight - window.innerHeight);
+        cardsPanel.scrollTop = Math.max(0, Math.min(maxScroll, cardsPanel.scrollTop));
+    }
+
     let lastDeltaY = 0;
     let firstScroll = true;
     window.addEventListener("wheel", (e) => {
@@ -293,6 +299,7 @@
             stripeboy.src = "stripe-boy-back.png";
         }
         lastDeltaY = e.deltaY;
+        clampCardsScroll();
         clearTimeout(scrollBubbleTimer);
         scrollBubbleTimer = setTimeout(() => { bubbleScroll.style.opacity = "0"; }, 1500);
     }, { passive: false });
