@@ -2,17 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ankur Podder | Bio</title>
     <style>
         @font-face { font-family: "BPdots"; src: url("bio-1/BPdots.otf") format("opentype"); }
         body, html { margin: 0; background: #fff; height: 100vh; width: 100vw; overflow: hidden; }
-        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center;  }
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         .pokedex-hardware { position: relative; transition: transform 2.4s ease-in; transform-origin: 47% 69.5%; width: 95vmin; height: 95vmin; max-width: 800px; max-height: 800px; background: url("bio-1/pokedex.png") no-repeat center center; background-size: contain; }
         .pokedex-screen-hitbox { position: absolute; top: 69.5%; left: 47%; transform: translate(-50%, -50%); width: 34%; height: 29%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1001; }
-        .boot-text { font-family: "BPdots", monospace; font-size: 1.2rem; color: #fff; text-align: center;  }
+        .boot-text { font-family: "BPdots", monospace; font-size: 1.2rem; color: #fff; text-align: center; }
         .blink { animation: blink 1.5s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        
+        #bio-content { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh; 
+            width: 100vw; 
+            background: #fff; 
+            opacity: 0; 
+            transition: opacity 0.25s ease-in; 
+            overflow: auto; 
+            cursor: grab;
+            -webkit-overflow-scrolling: touch;
+        }
+        #bio-content:active { cursor: grabbing; }
+        
+        #bio-content img { 
+            display: block;
+            width: 300vw; 
+            height: auto;
+            min-height: 200vh;
+            pointer-events: none;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -23,15 +47,52 @@
         </div>
     </div>
 </div>
+<div id="bio-content">
+    <img src="https://picsum.photos/6000/4000" alt="Bio Placeholder">
+</div>
 <script>
-    document.getElementById("start-btn").addEventListener("click", function() {
+    const startBtn = document.getElementById("start-btn");
+    const hw = document.querySelector(".pokedex-hardware");
+    const boot = document.getElementById("boot-screen");
+    const bio = document.getElementById("bio-content");
+
+    startBtn.addEventListener("click", function() {
+        // Clear text immediately so it doesn't scale with the hardware
         this.style.background = "#fff";
         this.innerHTML = "";
-        const hw = document.querySelector(".pokedex-hardware");
-        hw.style.transform = "scale(50)";
+        
+        hw.style.transform = "scale(60)";
+        
         setTimeout(() => {
-            document.getElementById("boot-screen").style.display = "none";
+            boot.style.display = "none";
+            bio.style.opacity = "1";
+            // Center the image initially
+            bio.scrollLeft = (bio.scrollWidth - bio.clientWidth) / 2;
+            bio.scrollTop = (bio.scrollHeight - bio.clientHeight) / 2;
         }, 2400);
+    });
+
+    // Desktop Panning
+    let isDown = false, startX, startY, scrollLeft, scrollTop;
+    bio.addEventListener('mousedown', (e) => {
+        isDown = true;
+        bio.classList.add('active');
+        startX = e.pageX - bio.offsetLeft;
+        startY = e.pageY - bio.offsetTop;
+        scrollLeft = bio.scrollLeft;
+        scrollTop = bio.scrollTop;
+    });
+    bio.addEventListener('mouseleave', () => isDown = false);
+    bio.addEventListener('mouseup', () => isDown = false);
+    bio.addEventListener('mousemove', (e) => {
+        if(!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - bio.offsetLeft;
+        const y = e.pageY - bio.offsetTop;
+        const walkX = (x - startX) * 1.5;
+        const walkY = (y - startY) * 1.5;
+        bio.scrollLeft = scrollLeft - walkX;
+        bio.scrollTop = scrollTop - walkY;
     });
 </script>
 </body>
