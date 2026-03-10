@@ -116,7 +116,21 @@
             transition: background 0.2s;
         }
         .card a:hover { background: #333; }
-    </style>
+    
+        /* Stripe boy — dead center of canvas */
+        #stripe-boy {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: auto;
+            max-height: 40%;
+            pointer-events: none;
+            user-select: none;
+            z-index: 2;
+        }
+        </style>
 </head>
 <body>
 
@@ -131,6 +145,7 @@
 <div id="bio-content">
     <div id="canvas">
         <img class="bg" src="placeholder.jpg" alt="Bio Background">
+        <img id="stripe-boy" src="stripe-boy.png" alt="Stripe Boy">
     </div>
 </div>
 
