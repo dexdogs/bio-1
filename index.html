@@ -131,6 +131,41 @@
             transition: background 0.2s;
         }
         .card a:hover { background: #333; }
+
+        /* Bubbles — pixel/gameboy style */
+        .bubble {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 3px solid #111;
+            padding: 10px 16px;
+            font-family: "BPdots", monospace;
+            font-size: 0.72rem;
+            color: #111;
+            white-space: nowrap;
+            border-radius: 0;
+            box-shadow: 4px 4px 0px #111;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 20;
+        }
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-right: 3px solid #111;
+            border-bottom: 3px solid #111;
+        }
+        #bubble-landing { top: calc(50% - 200px); }
+        #bubble-scroll  { top: calc(50% - 200px); }
+        #bubble-pan     { top: calc(50% - 200px); }
     </style>
 </head>
 <body>
@@ -150,6 +185,10 @@
 
 <!-- Stripe boy fixed center -->
 <img id="stripe-boy" src="stripe-boy.png" alt="Stripe Boy">
+
+<div id="bubble-landing" class="bubble">hi, I'm Ankur Podder</div>
+<div id="bubble-scroll" class="bubble">let's take a walk through what I do</div>
+<div id="bubble-pan" class="bubble">whoo! I'm flying!</div>
 
 <!-- Cards fixed right -->
 <div id="cards-panel">
@@ -205,6 +244,9 @@
     const bgImg = document.getElementById("bg-img");
     const stripeboy = document.getElementById("stripe-boy");
     const cardsPanel = document.getElementById("cards-panel");
+    const bubblePan = document.getElementById("bubble-pan");
+    const bubbleScroll = document.getElementById("bubble-scroll");
+    const bubbleLanding = document.getElementById("bubble-landing");
 
     // Current pan offset of background
     let panX = 0, panY = 0;
@@ -229,13 +271,19 @@
             bgLayer.style.opacity = "1";
             stripeboy.style.opacity = "1";
             cardsPanel.style.opacity = "1";
+            bubbleLanding.style.opacity = "1";
         }, 2400);
     });
 
+    // landing bubble shown on entry, scroll bubble hidden initially
+    let scrollBubbleTimer = null;
+
     // Wheel — scroll cards and background together, switch stripe boy
     let lastDeltaY = 0;
+    let firstScroll = true;
     window.addEventListener("wheel", (e) => {
         e.preventDefault();
+        if (firstScroll) { bubbleLanding.style.opacity = "0"; bubbleScroll.style.opacity = "1"; firstScroll = false; }
         cardsPanel.scrollTop += e.deltaY * 1.2;
         panY -= e.deltaY * 1.2;
         applyPan(panX, panY, false);
@@ -245,11 +293,14 @@
             stripeboy.src = "stripe-boy-back.png";
         }
         lastDeltaY = e.deltaY;
+        clearTimeout(scrollBubbleTimer);
+        scrollBubbleTimer = setTimeout(() => { bubbleScroll.style.opacity = "0"; }, 1500);
     }, { passive: false });
 
     // Desktop pan — drag moves background, release snaps back
     let isDown = false, startX, startY, startPanX, startPanY;
 
+    let panBubbleTimer = null;
     bgLayer.addEventListener("mousedown", (e) => {
         isDown = true;
         startX = e.clientX;
@@ -257,11 +308,19 @@
         startPanX = panX;
         startPanY = panY;
         applyPan(panX, panY, false);
+        bubbleLanding.style.opacity = "0";
+        bubbleScroll.style.opacity = "0";
+        panBubbleTimer = setTimeout(() => { bubblePan.style.opacity = "1"; }, 500);
     });
     window.addEventListener("mouseup", () => {
         if (!isDown) return;
         isDown = false;
-        snapBack();
+        clearTimeout(panBubbleTimer);
+        bubblePan.style.opacity = "0";
+        panX = 0;
+        applyPan(0, panY, true);
+        bubbleLanding.style.opacity = "1";
+        firstScroll = true;
     });
     window.addEventListener("mousemove", (e) => {
         if (!isDown) return;
