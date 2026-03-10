@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="preload" as="image" href="placeholder.jpg">
+    <link rel="preload" as="image" href="stripe-boy-back.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ankur Podder | Bio</title>
     <style>
@@ -16,33 +17,50 @@
         .blink { animation: blink 1.5s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-        #bio-content {
+        /* Background pan layer */
+        #bg-layer {
             position: fixed;
             top: 0; left: 0;
-            height: 100vh; width: 100vw;
-            background: #fff;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
             opacity: 0;
             transition: opacity 0.25s ease-in;
-            overflow: hidden;
             cursor: grab;
+            z-index: 1;
         }
-        #bio-content:active { cursor: grabbing; }
+        #bg-layer:active { cursor: grabbing; }
 
-        #canvas {
+        #bg-img {
             position: absolute;
-            top: 0; left: 0;
-        }
-
-        #canvas img.bg {
-            display: block;
             width: auto;
             height: auto;
+            min-width: 100vw;
             min-height: 100vh;
             pointer-events: none;
             user-select: none;
+            /* starts centered, pans via transform */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.5s ease;
         }
 
-        /* Cards: fixed to right, scroll with wheel anywhere on page */
+        /* Stripe boy — always fixed center of viewport */
+        #stripe-boy {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: auto;
+            height: 300px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.25s ease-in;
+        }
+
+        /* Cards panel — fixed right, scrolls independently */
         #cards-panel {
             position: fixed;
             top: 0;
@@ -57,6 +75,8 @@
             pointer-events: none;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            opacity: 0;
+            transition: opacity 0.25s ease-in;
         }
         #cards-panel::-webkit-scrollbar { display: none; }
 
@@ -71,7 +91,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.09);
             margin-bottom: 20px;
         }
-
         .card-tag {
             font-family: "BPdots", monospace;
             font-size: 0.62rem;
@@ -80,7 +99,6 @@
             text-transform: uppercase;
             margin-bottom: 5px;
         }
-
         .card h2 {
             margin: 0 0 3px 0;
             font-family: Georgia, serif;
@@ -88,21 +106,18 @@
             font-weight: 700;
             color: #111;
         }
-
         .card .meta {
             font-size: 0.74rem;
             color: #999;
             margin-bottom: 10px;
             font-family: monospace;
         }
-
         .card p {
             font-size: 0.84rem;
             line-height: 1.6;
             color: #444;
             margin: 0 0 14px 0;
         }
-
         .card a {
             display: inline-block;
             font-family: "BPdots", monospace;
@@ -116,21 +131,7 @@
             transition: background 0.2s;
         }
         .card a:hover { background: #333; }
-    
-        /* Stripe boy — dead center of canvas */
-        #stripe-boy {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: auto;
-            height: auto;
-            max-height: 40%;
-            pointer-events: none;
-            user-select: none;
-            z-index: 2;
-        }
-        </style>
+    </style>
 </head>
 <body>
 
@@ -142,13 +143,15 @@
     </div>
 </div>
 
-<div id="bio-content">
-    <div id="canvas">
-        <img class="bg" src="placeholder.jpg" alt="Bio Background">
-        <img id="stripe-boy" src="stripe-boy.png" alt="Stripe Boy">
-    </div>
+<!-- Background pan layer -->
+<div id="bg-layer">
+    <img id="bg-img" src="placeholder.jpg" alt="Bio Background">
 </div>
 
+<!-- Stripe boy fixed center -->
+<img id="stripe-boy" src="stripe-boy.png" alt="Stripe Boy">
+
+<!-- Cards fixed right -->
 <div id="cards-panel">
     <div class="card">
         <div class="card-tag">About</div>
@@ -157,7 +160,6 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
         <a href="#" target="_blank">[ learn more ]</a>
     </div>
-
     <div class="card">
         <div class="card-tag">Project</div>
         <h2>Carbon Computer</h2>
@@ -165,7 +167,6 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Continuous emissions monitoring converted into immutable data packets stored in facility-specific data lakehouses.</p>
         <a href="#" target="_blank">[ view project ]</a>
     </div>
-
     <div class="card">
         <div class="card-tag">Project</div>
         <h2>Gilman Air Sealing</h2>
@@ -173,7 +174,6 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Multi-mechanism model for post-intervention air sealing performance across 16 interventions.</p>
         <a href="#" target="_blank">[ view project ]</a>
     </div>
-
     <div class="card">
         <div class="card-tag">Work</div>
         <h2>Sustainability Consulting</h2>
@@ -181,7 +181,6 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
         <a href="#" target="_blank">[ see work ]</a>
     </div>
-
     <div class="card">
         <div class="card-tag">Project</div>
         <h2>India CCTS Research</h2>
@@ -189,7 +188,6 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deep analysis of India Carbon Credit Trading Scheme regulatory landscape and institutional structure.</p>
         <a href="#" target="_blank">[ read more ]</a>
     </div>
-
     <div class="card">
         <div class="card-tag">Contact</div>
         <h2>Get In Touch</h2>
@@ -203,20 +201,24 @@
     const startBtn = document.getElementById("start-btn");
     const hw = document.querySelector(".pokedex-hardware");
     const boot = document.getElementById("boot-screen");
-    const bio = document.getElementById("bio-content");
-    const canvas = document.getElementById("canvas");
+    const bgLayer = document.getElementById("bg-layer");
+    const bgImg = document.getElementById("bg-img");
+    const stripeboy = document.getElementById("stripe-boy");
     const cardsPanel = document.getElementById("cards-panel");
-    const bgImg = document.querySelector("img.bg");
 
-    function setCanvasSize() {
-        canvas.style.width = bgImg.naturalWidth + "px";
-        canvas.style.height = bgImg.naturalHeight + "px";
+    // Current pan offset of background
+    let panX = 0, panY = 0;
+
+    function applyPan(x, y, animate) {
+        bgImg.style.transition = animate ? "transform 0.5s ease" : "none";
+        bgImg.style.transform = "translate(calc(-50% + " + x + "px), calc(-50% + " + y + "px))";
     }
-    bgImg.addEventListener("load", setCanvasSize);
-    if (bgImg.complete) setCanvasSize();
 
-    function centerX() { return (canvas.offsetWidth - bio.offsetWidth) / 2; }
-    function centerY() { return (canvas.offsetHeight - bio.offsetHeight) / 2; }
+    function snapBack() {
+        panX = 0;
+        panY = 0;
+        applyPan(0, 0, true);
+    }
 
     startBtn.addEventListener("click", function() {
         this.style.background = "#fff";
@@ -224,61 +226,96 @@
         hw.style.transform = "scale(60)";
         setTimeout(() => {
             boot.style.display = "none";
-            bio.style.opacity = "1";
-            bio.scrollLeft = centerX();
-            bio.scrollTop = centerY();
+            bgLayer.style.opacity = "1";
+            stripeboy.style.opacity = "1";
+            cardsPanel.style.opacity = "1";
         }, 2400);
     });
 
-    function snapX() {
-        bio.scrollTo({
-            left: centerX(),
-            top: bio.scrollTop,
-            behavior: "smooth"
-        });
-    }
-
-    // Wheel anywhere on page scrolls both image and cards together
+    // Wheel — scroll cards and background together, switch stripe boy
+    let lastDeltaY = 0;
     window.addEventListener("wheel", (e) => {
         e.preventDefault();
-        bio.scrollTop += e.deltaY * 1.2;
         cardsPanel.scrollTop += e.deltaY * 1.2;
+        panY -= e.deltaY * 1.2;
+        applyPan(panX, panY, false);
+        if (e.deltaY > 0 && lastDeltaY <= 0) {
+            stripeboy.src = "stripe-boy.png";
+        } else if (e.deltaY < 0 && lastDeltaY >= 0) {
+            stripeboy.src = "stripe-boy-back.png";
+        }
+        lastDeltaY = e.deltaY;
     }, { passive: false });
 
-    // Desktop pan — only on bio-content, not on cards
-    let isDown = false, startX, startY, scrollLeft, scrollTop;
-    bio.addEventListener("mousedown", (e) => {
+    // Desktop pan — drag moves background, release snaps back
+    let isDown = false, startX, startY, startPanX, startPanY;
+
+    bgLayer.addEventListener("mousedown", (e) => {
         isDown = true;
-        startX = e.pageX;
-        startY = e.pageY;
-        scrollLeft = bio.scrollLeft;
-        scrollTop = bio.scrollTop;
+        startX = e.clientX;
+        startY = e.clientY;
+        startPanX = panX;
+        startPanY = panY;
+        applyPan(panX, panY, false);
     });
-    bio.addEventListener("mouseleave", () => { isDown = false; snapX(); });
-    bio.addEventListener("mouseup", () => { isDown = false; snapX(); });
-    bio.addEventListener("mousemove", (e) => {
+    window.addEventListener("mouseup", () => {
         if (!isDown) return;
-        e.preventDefault();
-        bio.scrollLeft = scrollLeft - (e.pageX - startX) * 1.5;
-        bio.scrollTop = scrollTop - (e.pageY - startY) * 1.5;
+        isDown = false;
+        snapBack();
+    });
+    window.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        panX = startPanX + (e.clientX - startX);
+        panY = startPanY + (e.clientY - startY);
+        applyPan(panX, panY, false);
     });
 
-    // Touch — pan image, snap X on release, cards scroll with touch on their panel
-    let touchStartX, touchStartY, touchScrollLeft, touchScrollTop;
-    bio.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].pageX;
-        touchStartY = e.touches[0].pageY;
-        touchScrollLeft = bio.scrollLeft;
-        touchScrollTop = bio.scrollTop;
-    });
-    bio.addEventListener("touchmove", (e) => {
+    // Touch — swipe scrolls cards, drag pans background, release snaps back
+    let touchStartX, touchStartY, touchStartPanX, touchStartPanY;
+    let isPanning = false;
+
+    bgLayer.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartPanX = panX;
+        touchStartPanY = panY;
+        isPanning = true;
+    }, { passive: true });
+
+    let lastTouchY = 0;
+    bgLayer.addEventListener("touchmove", (e) => {
+        if (!isPanning) return;
         e.preventDefault();
-        const dy = e.touches[0].pageY - touchStartY;
-        bio.scrollLeft = touchScrollLeft - (e.touches[0].pageX - touchStartX) * 1.5;
-        bio.scrollTop = touchScrollTop - dy * 1.5;
-        cardsPanel.scrollTop = cardsPanel.scrollTop - dy * 0.1;
+        const dx = e.touches[0].clientX - touchStartX;
+        const dy = e.touches[0].clientY - touchStartY;
+        const currentY = e.touches[0].clientY;
+        if (currentY < lastTouchY) {
+            stripeboy.src = "stripe-boy.png";
+        } else if (currentY > lastTouchY) {
+            stripeboy.src = "stripe-boy-back.png";
+        }
+        lastTouchY = currentY;
+        panX = touchStartPanX + dx;
+        panY = touchStartPanY + dy;
+        applyPan(panX, panY, false);
+        cardsPanel.scrollTop = cardsPanel.scrollTop - (dy - (panY - touchStartPanY - (e.touches[0].clientY - touchStartY)));
     }, { passive: false });
-    bio.addEventListener("touchend", () => snapX());
+
+    bgLayer.addEventListener("touchend", () => {
+        isPanning = false;
+        // snap X only, preserve Y scroll
+        panX = 0;
+        applyPan(0, panY, true);
+    });
+
+    // Touch on cards panel scrolls cards
+    let cardsTouchStartY;
+    cardsPanel.addEventListener("touchstart", (e) => {
+        cardsTouchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    cardsPanel.addEventListener("touchmove", (e) => {
+        e.stopPropagation();
+    }, { passive: true });
 </script>
 </body>
 </html>
