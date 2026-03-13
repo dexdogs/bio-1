@@ -75,7 +75,7 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 0 20px 350px 20px;
+            padding: calc(50vh - 150px) 20px 350px 20px;
             box-sizing: border-box;
             z-index: 10;
             pointer-events: none;
@@ -84,9 +84,8 @@
             opacity: 0;
             transition: opacity 0.25s ease-in;
             display: grid;
-            grid-template-columns: repeat(auto-fill, 40px);
-            gap: 5px;
-            justify-content: start;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
             align-content: start;
         }
         #cards-panel::-webkit-scrollbar { display: none; }
@@ -97,51 +96,52 @@
             aspect-ratio: 1;
             overflow: hidden;
             background: #fff;
-            border: 2px solid #111;
+            border: 4px solid #111;
             border-radius: 0;
-            padding: 3px 4px;
+            padding: 10px 12px;
             box-sizing: border-box;
             box-shadow:
-                inset 2px 2px 0 rgba(255,255,255,0.8),
-                inset -2px -2px 0 rgba(0,0,0,0.2);
+                inset 5px 5px 0 rgba(255,255,255,0.55),
+                inset -5px -5px 0 rgba(0,0,0,0.35);
         }
         .card-tag {
             font-family: "BPdots", monospace;
-            font-size: 0.42rem;
-            letter-spacing: 0.1em;
-            color: rgba(0,0,0,0.5);
+            font-size: 0.55rem;
+            letter-spacing: 0.14em;
+            color: rgba(0,0,0,0.6);
             text-transform: uppercase;
-            margin-bottom: 1px;
+            margin-bottom: 3px;
         }
         .card h2 {
-            margin: 0 0 1px 0;
+            margin: 0 0 2px 0;
             font-family: "BPdots", monospace;
-            font-size: 0.52rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: #111;
         }
         .card .meta {
-            font-size: 0.42rem;
-            color: #333;
-            margin: 0;
+            font-size: 0.65rem;
+            color: rgba(0,0,0,0.55);
+            margin-bottom: 6px;
             font-family: monospace;
-            line-height: 1.2;
         }
         .card p {
-            font-size: 0.42rem;
-            line-height: 1.2;
-            color: #333;
-            margin: 0;
+            font-size: 0.7rem;
+            line-height: 1.4;
+            color: #222;
+            margin: 0 0 8px 0;
         }
         .card a {
             display: inline-block;
             font-family: "BPdots", monospace;
-            font-size: 0.4rem;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
             color: #fff;
             background: #111;
-            padding: 2px 6px;
+            padding: 4px 10px;
             border-radius: 0;
             text-decoration: none;
+            transition: background 0.2s;
         }
         .card a:hover { background: #333; }
 
@@ -331,16 +331,16 @@
             100% { opacity: 0;    transform: scale(0.5); }
         }
 
-        /* ── Responsive tile sizes (always square via aspect-ratio: 1) ── */
-        /* Mobile portrait ≤ 480 px: 24 px tiles */
+        /* ── Responsive grid ── */
+        /* Mobile portrait ≤ 480 px: 1 column */
         @media (max-width: 480px) {
-            #cards-panel { grid-template-columns: repeat(auto-fill, 24px); gap: 5px; }
+            #cards-panel { grid-template-columns: repeat(1, 1fr); gap: 3px; }
         }
-        /* Mobile landscape / small tablet 481–900 px: 32 px tiles */
+        /* Mobile landscape / small tablet 481–900 px: 2 columns */
         @media (min-width: 481px) and (max-width: 900px) {
-            #cards-panel { grid-template-columns: repeat(auto-fill, 32px); gap: 5px; }
+            #cards-panel { grid-template-columns: repeat(2, 1fr); gap: 3px; }
         }
-        /* Desktop > 900 px: 40 px tiles (default in #cards-panel rule above) */
+        /* Desktop > 900 px: 3 columns (default in #cards-panel rule above) */
     </style>
 </head>
 <body>
@@ -541,9 +541,11 @@ startBtn.addEventListener("click", function() {
     }
 
     function clampPanX() {
-        const imgW = bgImg.offsetWidth;
-        const maxPanX = imgW / 2 - window.innerWidth / 2;
-        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+        const imgW     = bgImg.offsetWidth;              // content + 700 px borders
+        const contentW = imgW - 700;                     // image-only width (no borders)
+        const maxRight = contentW / 2 - window.innerWidth / 3;   // content left at stripe boy X (vw/6)
+        const maxLeft  = -(imgW / 2 - window.innerWidth / 2);    // outer right border at viewport right
+        panX = Math.max(maxLeft, Math.min(maxRight, panX));
     }
 
     let firstScroll = true;
