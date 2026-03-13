@@ -78,19 +78,24 @@
             -ms-overflow-style: none;
             opacity: 0;
             transition: opacity 0.25s ease-in;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+            align-content: start;
         }
         #cards-panel::-webkit-scrollbar { display: none; }
 
         .card {
             pointer-events: all;
-            width: 100%;
+            aspect-ratio: 1;
+            overflow: hidden;
             background: rgba(255,255,255,0.93);
             border: 1px solid #e0e0e0;
             border-radius: 12px;
             padding: 20px 22px;
             box-sizing: border-box;
             box-shadow: 0 4px 20px rgba(0,0,0,0.09);
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
         .card-tag {
             font-family: "BPdots", monospace;
@@ -164,9 +169,9 @@
             border-right: 3px solid #111;
             border-bottom: 3px solid #111;
         }
-        #bubble-landing { top: calc(50% - 185px); }
-        #bubble-scroll  { top: calc(50% - 185px); }
-        #bubble-pan     { top: calc(50% - 185px); }
+        #bubble-landing { top: calc(50% - 160px); }
+        #bubble-scroll  { top: calc(50% - 160px); }
+        #bubble-pan     { top: calc(50% - 160px); }
 
         /* Pokemon-style ambient animations */
 
@@ -394,6 +399,62 @@
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Always open to interesting problems in carbon markets and industrial decarbonization.</p>
         <a href="#" target="_blank">[ connect ]</a>
     </div>
+    <div class="card">
+        <div class="card-tag">Project</div>
+        <h2>Lorem Project</h2>
+        <div class="meta">Category · 2024</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam quis nostrud exercitation.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Work</div>
+        <h2>Lorem Work</h2>
+        <div class="meta">Category · 2023</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Research</div>
+        <h2>Lorem Research</h2>
+        <div class="meta">Category · 2024</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident.</p>
+        <a href="#" target="_blank">[ read ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Project</div>
+        <h2>Lorem Project B</h2>
+        <div class="meta">Category · 2023</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sunt in culpa qui officia deserunt mollit anim.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Work</div>
+        <h2>Lorem Work B</h2>
+        <div class="meta">Category · 2022</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id est laborum et dolorum fuga recusandae.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Research</div>
+        <h2>Lorem Research B</h2>
+        <div class="meta">Category · 2023</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam libero tempore cum soluta nobis eligendi.</p>
+        <a href="#" target="_blank">[ read ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Project</div>
+        <h2>Lorem Project C</h2>
+        <div class="meta">Category · 2024</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Temporibus autem quibusdam officiis debitis.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
+    <div class="card">
+        <div class="card-tag">Work</div>
+        <h2>Lorem Work C</h2>
+        <div class="meta">Category · 2022</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis autem vel eum reprehenderit voluptate.</p>
+        <a href="#" target="_blank">[ view ]</a>
+    </div>
 </div>
 
 <script>
@@ -451,12 +512,20 @@ startBtn.addEventListener("click", function() {
         cardsPanel.scrollTop = Math.max(0, Math.min(maxScroll, cardsPanel.scrollTop));
     }
 
+    function clampPanY() {
+        const imgH = bgImg.offsetHeight;
+        const maxPanY = imgH / 2 - window.innerHeight / 2;
+        const minPanY = window.innerHeight / 2 - imgH / 2;
+        panY = Math.max(minPanY, Math.min(maxPanY, panY));
+    }
+
     let firstScroll = true;
     window.addEventListener("wheel", (e) => {
         e.preventDefault();
         if (firstScroll) { bubbleLanding.style.opacity = "0"; bubbleScroll.style.opacity = "1"; firstScroll = false; }
         cardsPanel.scrollTop += e.deltaY * 1.2;
         panY -= e.deltaY * 1.2;
+        clampPanY();
         applyPan(panX, panY, false);
         if (e.deltaY > 0) {
             stripeboy.src = "stripe-boy.png";
@@ -497,6 +566,7 @@ startBtn.addEventListener("click", function() {
         if (!isDown) return;
         panX = startPanX + (e.clientX - startX);
         panY = startPanY + (e.clientY - startY);
+        clampPanY();
         applyPan(panX, panY, false);
     });
 
@@ -529,6 +599,7 @@ startBtn.addEventListener("click", function() {
         lastTouchY = currentY;
         panX = touchStartPanX + dx;
         panY = touchStartPanY + dy;
+        clampPanY();
         applyPan(panX, panY, false);
         cardsPanel.scrollTop -= deltaY;
         clampCardsScroll();
