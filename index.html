@@ -169,9 +169,9 @@
             border-right: 3px solid #111;
             border-bottom: 3px solid #111;
         }
-        #bubble-landing { top: calc(50% - 160px); }
-        #bubble-scroll  { top: calc(50% - 160px); }
-        #bubble-pan     { top: calc(50% - 160px); }
+        #bubble-landing { top: calc(50% - 120px); }
+        #bubble-scroll  { top: calc(50% - 120px); }
+        #bubble-pan     { top: calc(50% - 120px); }
 
         /* Pokemon-style ambient animations */
 
@@ -323,6 +323,16 @@
             40%  { opacity: 0.85; transform: scale(1.3); }
             100% { opacity: 0;    transform: scale(0.5); }
         }
+
+        #top-bar, #bottom-bar {
+            position: fixed;
+            left: 0; right: 0;
+            background: #000;
+            z-index: 15;
+            pointer-events: none;
+        }
+        #top-bar    { top: 0;    height: calc(50vh - 160px); }
+        #bottom-bar { bottom: 0; height: calc(50vh - 160px); }
     </style>
 </head>
 <body>
@@ -457,6 +467,9 @@
     </div>
 </div>
 
+<div id="top-bar"></div>
+<div id="bottom-bar"></div>
+
 <script>
     const startBtn = document.getElementById("start-btn");
     const hw = document.querySelector(".pokedex-hardware");
@@ -505,6 +518,9 @@ startBtn.addEventListener("click", function() {
 
     // landing bubble shown on entry, scroll bubble hidden initially
     let scrollBubbleTimer = null;
+    let scrollStopTimer = null;
+
+    document.addEventListener("click", () => { stripeboy.src = "stripe-boy.png"; });
 
     // Wheel — scroll cards and background together, switch stripe boy
     function clampCardsScroll() {
@@ -513,10 +529,7 @@ startBtn.addEventListener("click", function() {
     }
 
     function clampPanY() {
-        const imgH = bgImg.offsetHeight;
-        const maxPanY = imgH / 2 - window.innerHeight / 2;
-        const minPanY = window.innerHeight / 2 - imgH / 2;
-        panY = Math.max(minPanY, Math.min(maxPanY, panY));
+        panY = Math.max(-160, Math.min(160, panY));
     }
 
     let firstScroll = true;
@@ -535,6 +548,8 @@ startBtn.addEventListener("click", function() {
         clampCardsScroll();
         clearTimeout(scrollBubbleTimer);
         scrollBubbleTimer = setTimeout(() => { bubbleScroll.style.opacity = "0"; }, 1500);
+        clearTimeout(scrollStopTimer);
+        scrollStopTimer = setTimeout(() => { stripeboy.src = "stripe-boy.png"; }, 150);
     }, { passive: false });
 
     // Desktop pan — drag moves background, release snaps back
@@ -610,6 +625,7 @@ startBtn.addEventListener("click", function() {
         // snap X only, preserve Y scroll
         panX = -window.innerWidth / 3;
         applyPan(panX, panY, true);
+        stripeboy.src = "stripe-boy.png";
     });
 
     // Touch on cards panel scrolls cards
