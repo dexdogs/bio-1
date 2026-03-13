@@ -46,6 +46,8 @@
             box-sizing: content-box;
             border-top: 350px solid #000;
             border-bottom: 350px solid #000;
+            border-left: 350px solid #000;
+            border-right: 350px solid #000;
         }
 
         /* Stripe boy — fixed at center of left 1/3 of viewport */
@@ -82,75 +84,64 @@
             opacity: 0;
             transition: opacity 0.25s ease-in;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 3px;
+            grid-template-columns: repeat(auto-fill, 40px);
+            gap: 5px;
+            justify-content: start;
             align-content: start;
         }
         #cards-panel::-webkit-scrollbar { display: none; }
 
-        /* ── Tetris tile cards ── */
+        /* ── Square tile cards — white/black ── */
         .card {
             pointer-events: all;
             aspect-ratio: 1;
             overflow: hidden;
-            border: 4px solid #111;
+            background: #fff;
+            border: 2px solid #111;
             border-radius: 0;
-            padding: 10px 12px;
+            padding: 3px 4px;
             box-sizing: border-box;
             box-shadow:
-                inset 5px 5px 0 rgba(255,255,255,0.55),
-                inset -5px -5px 0 rgba(0,0,0,0.35);
-            margin-bottom: 0;
+                inset 2px 2px 0 rgba(255,255,255,0.8),
+                inset -2px -2px 0 rgba(0,0,0,0.2);
         }
-        /* Tetris block colours — cycle through 7 piece colours */
-        .card:nth-child(7n+1) { background: #00e5e5; } /* I — cyan   */
-        .card:nth-child(7n+2) { background: #e5e500; } /* O — yellow */
-        .card:nth-child(7n+3) { background: #9900e5; } /* T — purple */
-        .card:nth-child(7n+4) { background: #00cc00; } /* S — green  */
-        .card:nth-child(7n+5) { background: #e50000; } /* Z — red    */
-        .card:nth-child(7n+6) { background: #0000e5; } /* J — blue   */
-        .card:nth-child(7n+0) { background: #e58800; } /* L — orange */
-        /* White text on dark tiles */
-        .card:nth-child(7n+3) *, .card:nth-child(7n+5) *, .card:nth-child(7n+6) * { color: #fff !important; }
-        .card:nth-child(7n+3) a, .card:nth-child(7n+5) a, .card:nth-child(7n+6) a { background: rgba(255,255,255,0.25) !important; }
         .card-tag {
             font-family: "BPdots", monospace;
-            font-size: 0.55rem;
-            letter-spacing: 0.14em;
-            color: rgba(0,0,0,0.6);
+            font-size: 0.42rem;
+            letter-spacing: 0.1em;
+            color: rgba(0,0,0,0.5);
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 1px;
         }
         .card h2 {
-            margin: 0 0 2px 0;
+            margin: 0 0 1px 0;
             font-family: "BPdots", monospace;
-            font-size: 0.85rem;
+            font-size: 0.52rem;
             font-weight: 700;
             color: #111;
         }
         .card .meta {
-            font-size: 0.65rem;
-            color: rgba(0,0,0,0.55);
-            margin-bottom: 6px;
+            font-size: 0.42rem;
+            color: #333;
+            margin: 0;
             font-family: monospace;
+            line-height: 1.2;
         }
         .card p {
-            font-size: 0.7rem;
-            line-height: 1.4;
-            color: #222;
-            margin: 0 0 8px 0;
+            font-size: 0.42rem;
+            line-height: 1.2;
+            color: #333;
+            margin: 0;
         }
         .card a {
             display: inline-block;
             font-family: "BPdots", monospace;
-            font-size: 0.6rem;
-            letter-spacing: 0.08em;
+            font-size: 0.4rem;
             color: #fff;
             background: #111;
-            padding: 4px 10px;
+            padding: 2px 6px;
             border-radius: 0;
             text-decoration: none;
-            transition: background 0.2s;
         }
         .card a:hover { background: #333; }
 
@@ -340,16 +331,16 @@
             100% { opacity: 0;    transform: scale(0.5); }
         }
 
-        /* ── Responsive grid ── */
-        /* Mobile portrait ≤ 480 px: 1 column */
+        /* ── Responsive tile sizes (always square via aspect-ratio: 1) ── */
+        /* Mobile portrait ≤ 480 px: 24 px tiles */
         @media (max-width: 480px) {
-            #cards-panel { grid-template-columns: repeat(1, 1fr); }
+            #cards-panel { grid-template-columns: repeat(auto-fill, 24px); gap: 5px; }
         }
-        /* Mobile landscape / small tablet 481–900 px: 2 columns */
+        /* Mobile landscape / small tablet 481–900 px: 32 px tiles */
         @media (min-width: 481px) and (max-width: 900px) {
-            #cards-panel { grid-template-columns: repeat(2, 1fr); }
+            #cards-panel { grid-template-columns: repeat(auto-fill, 32px); gap: 5px; }
         }
-        /* Desktop > 900 px: 3 columns (default in #cards-panel rule above) */
+        /* Desktop > 900 px: 40 px tiles (default in #cards-panel rule above) */
     </style>
 </head>
 <body>
@@ -549,6 +540,12 @@ startBtn.addEventListener("click", function() {
         panY = Math.max(minPanY, Math.min(maxPanY, panY));
     }
 
+    function clampPanX() {
+        const imgW = bgImg.offsetWidth;
+        const maxPanX = imgW / 2 - window.innerWidth / 2;
+        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+    }
+
     let firstScroll = true;
     window.addEventListener("wheel", (e) => {
         e.preventDefault();
@@ -590,6 +587,7 @@ startBtn.addEventListener("click", function() {
         clearTimeout(panBubbleTimer);
         bubblePan.style.opacity = "0";
         panX = -window.innerWidth / 3;
+        clampPanX();
         applyPan(panX, panY, true);
         bubbleLanding.style.opacity = "1";
         firstScroll = true;
@@ -598,6 +596,7 @@ startBtn.addEventListener("click", function() {
         if (!isDown) return;
         panX = startPanX + (e.clientX - startX);
         panY = startPanY + (e.clientY - startY);
+        clampPanX();
         clampPanY();
         applyPan(panX, panY, false);
     });
@@ -631,6 +630,7 @@ startBtn.addEventListener("click", function() {
         lastTouchY = currentY;
         panX = touchStartPanX + dx;
         panY = touchStartPanY + dy;
+        clampPanX();
         clampPanY();
         applyPan(panX, panY, false);
         cardsPanel.scrollTop -= deltaY;
@@ -641,6 +641,7 @@ startBtn.addEventListener("click", function() {
         isPanning = false;
         // snap X only, preserve Y scroll
         panX = -window.innerWidth / 3;
+        clampPanX();
         applyPan(panX, panY, true);
         stripeboy.src = "stripe-boy.png";
     });
