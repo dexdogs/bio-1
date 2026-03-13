@@ -70,7 +70,7 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 40px 20px 40px 20px;
+            padding: calc(50vh - 150px) 20px 40px 20px;
             box-sizing: border-box;
             z-index: 10;
             pointer-events: none;
@@ -136,7 +136,7 @@
         /* Bubbles — pixel/gameboy style */
         .bubble {
             position: fixed;
-            left: 50%;
+            left: calc(100vw / 6);
             transform: translateX(-50%);
             background: #fff;
             border: 3px solid #111;
@@ -164,9 +164,9 @@
             border-right: 3px solid #111;
             border-bottom: 3px solid #111;
         }
-        #bubble-landing { top: calc(50% - 120px); }
-        #bubble-scroll  { top: calc(50% - 120px); }
-        #bubble-pan     { top: calc(50% - 120px); }
+        #bubble-landing { top: calc(50% - 185px); }
+        #bubble-scroll  { top: calc(50% - 185px); }
+        #bubble-pan     { top: calc(50% - 185px); }
 
         /* Pokemon-style ambient animations */
 
@@ -426,7 +426,7 @@
 
     function applyPan(x, y, animate) {
         bgImg.style.transition = animate ? "transform 0.5s ease" : "none";
-        bgImg.style.transform = "translate(calc(-50% - 33.33vw + " + x + "px), calc(-50% + " + y + "px))";
+        bgImg.style.transform = "translate(calc(-50% + " + x + "px), calc(-50% + " + y + "px))";
     }
 
 startBtn.addEventListener("click", function() {
@@ -451,7 +451,6 @@ startBtn.addEventListener("click", function() {
         cardsPanel.scrollTop = Math.max(0, Math.min(maxScroll, cardsPanel.scrollTop));
     }
 
-    let lastDeltaY = 0;
     let firstScroll = true;
     window.addEventListener("wheel", (e) => {
         e.preventDefault();
@@ -459,12 +458,11 @@ startBtn.addEventListener("click", function() {
         cardsPanel.scrollTop += e.deltaY * 1.2;
         panY -= e.deltaY * 1.2;
         applyPan(panX, panY, false);
-        if (e.deltaY > 0 && lastDeltaY <= 0) {
+        if (e.deltaY > 0) {
             stripeboy.src = "stripe-boy.png";
-        } else if (e.deltaY < 0 && lastDeltaY >= 0) {
+        } else if (e.deltaY < 0) {
             stripeboy.src = "stripe-boy-back.png";
         }
-        lastDeltaY = e.deltaY;
         clampCardsScroll();
         clearTimeout(scrollBubbleTimer);
         scrollBubbleTimer = setTimeout(() => { bubbleScroll.style.opacity = "0"; }, 1500);
