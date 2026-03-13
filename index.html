@@ -428,13 +428,7 @@
         bgImg.style.transform = "translate(calc(-50% + " + x + "px), calc(-50% + " + y + "px))";
     }
 
-    function snapBack() {
-        panX = 0;
-        panY = 0;
-        applyPan(0, 0, true);
-    }
-
-    startBtn.addEventListener("click", function() {
+startBtn.addEventListener("click", function() {
         this.style.background = "#fff";
         this.innerHTML = "";
         hw.style.transform = "scale(60)";
@@ -452,7 +446,6 @@
 
     // Wheel — scroll cards and background together, switch stripe boy
     function clampCardsScroll() {
-        const { h } = getImgSize();
         const maxScroll = Math.max(0, cardsPanel.scrollHeight - window.innerHeight);
         cardsPanel.scrollTop = Math.max(0, Math.min(maxScroll, cardsPanel.scrollTop));
     }
@@ -517,6 +510,7 @@
         touchStartY = e.touches[0].clientY;
         touchStartPanX = panX;
         touchStartPanY = panY;
+        lastTouchY = e.touches[0].clientY;
         isPanning = true;
     }, { passive: true });
 
@@ -524,19 +518,21 @@
     bgLayer.addEventListener("touchmove", (e) => {
         if (!isPanning) return;
         e.preventDefault();
+        const currentY = e.touches[0].clientY;
         const dx = e.touches[0].clientX - touchStartX;
         const dy = e.touches[0].clientY - touchStartY;
-        const currentY = e.touches[0].clientY;
-        if (currentY < lastTouchY) {
+        const deltaY = currentY - lastTouchY;
+        if (deltaY < 0) {
             stripeboy.src = "stripe-boy.png";
-        } else if (currentY > lastTouchY) {
+        } else if (deltaY > 0) {
             stripeboy.src = "stripe-boy-back.png";
         }
         lastTouchY = currentY;
         panX = touchStartPanX + dx;
         panY = touchStartPanY + dy;
         applyPan(panX, panY, false);
-        cardsPanel.scrollTop = cardsPanel.scrollTop - (dy - (panY - touchStartPanY - (e.touches[0].clientY - touchStartY)));
+        cardsPanel.scrollTop -= deltaY;
+        clampCardsScroll();
     }, { passive: false });
 
     bgLayer.addEventListener("touchend", () => {
