@@ -38,18 +38,18 @@
             min-height: 100vh;
             pointer-events: none;
             user-select: none;
-            /* starts centered, pans via transform */
+            /* starts centered at left 1/3, pans via transform */
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(calc(-50% - 33.33vw), -50%);
             transition: transform 0.5s ease;
         }
 
-        /* Stripe boy — always fixed center of viewport */
+        /* Stripe boy — fixed at center of left 1/3 of viewport */
         #stripe-boy {
             position: fixed;
             top: 50%;
-            left: 50%;
+            left: calc(100vw / 6);
             transform: translate(-50%, -50%);
             width: auto;
             height: 300px;
@@ -64,12 +64,13 @@
         #cards-panel {
             position: fixed;
             top: 0;
+            left: calc(100vw / 3);
             right: 0;
-            width: min(400px, 40vw);
+            width: auto;
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 40px 20px 40px 0;
+            padding: 40px 20px 40px 20px;
             box-sizing: border-box;
             z-index: 10;
             pointer-events: none;
@@ -421,11 +422,11 @@
     const bubbleLanding = document.getElementById("bubble-landing");
 
     // Current pan offset of background
-    let panX = 0, panY = 0;
+    let panX = -window.innerWidth / 3, panY = 0;
 
     function applyPan(x, y, animate) {
         bgImg.style.transition = animate ? "transform 0.5s ease" : "none";
-        bgImg.style.transform = "translate(calc(-50% + " + x + "px), calc(-50% + " + y + "px))";
+        bgImg.style.transform = "translate(calc(-50% - 33.33vw + " + x + "px), calc(-50% + " + y + "px))";
     }
 
 startBtn.addEventListener("click", function() {
@@ -489,8 +490,8 @@ startBtn.addEventListener("click", function() {
         isDown = false;
         clearTimeout(panBubbleTimer);
         bubblePan.style.opacity = "0";
-        panX = 0;
-        applyPan(0, panY, true);
+        panX = -window.innerWidth / 3;
+        applyPan(panX, panY, true);
         bubbleLanding.style.opacity = "1";
         firstScroll = true;
     });
@@ -538,8 +539,8 @@ startBtn.addEventListener("click", function() {
     bgLayer.addEventListener("touchend", () => {
         isPanning = false;
         // snap X only, preserve Y scroll
-        panX = 0;
-        applyPan(0, panY, true);
+        panX = -window.innerWidth / 3;
+        applyPan(panX, panY, true);
     });
 
     // Touch on cards panel scrolls cards
